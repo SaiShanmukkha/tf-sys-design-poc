@@ -1,6 +1,6 @@
 resource "aws_instance" "test_tf_instance" {
-  ami                    = "ami-0b823aa03ebf22c93"
-  instance_type          = "t3a.nano"
+  ami                    = "ami-09dcba964a9c51505"
+  instance_type          = "t3a.micro"
   vpc_security_group_ids = [aws_security_group.sg1.id]
   key_name               = aws_key_pair.deployer_key.key_name
 
