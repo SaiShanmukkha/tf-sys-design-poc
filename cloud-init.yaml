@@ -1,8 +1,45 @@
 #cloud-config
+#
+# Cloud-init config to:
+# - create a user "spiderman" (Peter Parker) with passwordless sudo
+# - install Apache + Python/pip + MkDocs
+# - build a fresh MkDocs site and publish it to /var/www/html
+#
+
+groups:
+  - ubuntu: [root, sys]
+  - dpro42-group
+
+users:
+  - default
+  - name: spiderman
+    gecos: Peter Parker
+    shell: /bin/bash
+    primary_group: dpro42-group
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    lock_passwd: false
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEsh0zMkj/iuJeWbZsw+iUVjjypVCFVwM57f9ELZQg2e sai@rhel
+
 package_update: true
-package_upgrade: true
+package_upgrade: false
+
 packages:
   - httpd
+  - python3-pip
+
 runcmd:
+  - touch /home/spiderman/hello.txt
+  - 'echo "Hello! and welcome to this server! Destroy me when you are done!" >> /home/spiderman/hello.txt'
+  - pip3 install mkdocs
+  - mkdir -p /home/spiderman/mkdocs
+  - chown -R spiderman:dpro42-group /home/spiderman/mkdocs
+  - cd /home/spiderman/mkdocs
+  - mkdocs new mkdocs-project
+  - cd /home/spiderman/mkdocs/mkdocs-project
+  - mkdocs build
+  - rm -f /var/www/html/index.html
+  - cp -R site/* /var/www/html/
   - systemctl enable httpd
-  - systemctl start httpd
+  - systemctl restart httpd
