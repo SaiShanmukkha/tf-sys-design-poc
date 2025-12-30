@@ -7,6 +7,6 @@ resource "aws_instance" "test_tf_instance" {
   user_data = file("${path.module}/cloud-init.yaml")
 
   tags = {
-    Name = "test_tf_instance"
+    Name = var.instance_name
   }
 }
